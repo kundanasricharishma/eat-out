@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        h1{
+            text-align: center;
+            font-family: 100px;
+            text-shadow: 2px 2px 3px grey;
+        }
+        .cart-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 20px;
+        }
+        .cart-item img {
+            width: 100px;
+            height: 100px;
+            margin-right: 10px;
+            border-radius: 50%;
+        }
+        .cart-item button {
+            margin-left: 10px;
+            font-size: large;
+            background-color: rgb(176, 232, 92);
+            border:1px solid green;
+            padding: 10px;
+        }
+        .total-cost {
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Cart Page</h1>
+    <div id="cart-items"></div>
+    <div class="total-cost" id="total-cost">Total Cost: $0</div>
+
+    <script>
+        function loadCart() {
+            const cart = JSON.parse(localStorage.getItem('cart')) || {};
+            const cartItemsDiv = document.getElementById('cart-items');
+            cartItemsDiv.innerHTML = '';
+            let totalCost = 0;
+
+            for (let id in cart) {
+                const item = cart[id];
+                totalCost += item.price * item.quantity;
+
+                const cartItemDiv = document.createElement('div');
+                cartItemDiv.className = 'cart-item';
+                cartItemDiv.innerHTML = `
+                    <img src="${item.imgs}" alt="${item.name}">
+                    <span>${item.name} - $${item.price.toFixed(2)}</span>
+                    <div>
+                        <button onclick="changeQuantity(${id}, -1)">-</button>
+                        <span>${item.quantity}</span>
+                        <button onclick="changeQuantity(${id}, 1)">+</button>
+                    </div>
+                `;
+
+                cartItemsDiv.appendChild(cartItemDiv);
+            }
+
+            document.getElementById('total-cost').innerText = `Total Cost: $${totalCost.toFixed(2)}`;
+        }
+
+        function changeQuantity(id, change) {
+            let cart = JSON.parse(localStorage.getItem('cart')) || {};
+            if (cart[id]) {
+                cart[id].quantity += change;
+                if (cart[id].quantity <= 0) {
+                    delete cart[id];
+                }
+                localStorage.setItem('cart', JSON.stringify(cart));
+                loadCart();
+            }
+        }
+
+        window.onload = loadCart;
+    </script>
+</body>
+</html>
